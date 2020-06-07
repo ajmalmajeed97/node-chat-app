@@ -10,30 +10,33 @@ const $messages = document.querySelector('#messages')
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
-const sidebarTemplate=document.querySelector('#sidebar-template').innerHTML
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
+
 // Options
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
-const autoscroll=()=>{
-//new message element
-const $newMessage=$messages.lastElementChild
-///height
-const newMessageStyles=getComputedStyle($newMessage)
-const newMessageMargin=parseInt(newMessageStyles.marginBottom)
-const newMessageHeight=$newMessage.offsetHeight+newMessageMargin
 
-///visible height
- const visibleHeight=$messages.offsetHeight
+const autoscroll = () => {
+    // New message element
+    const $newMessage = $messages.lastElementChild
 
- //height of messages container
- const containerHeight=$messages.scrollHeight
+    // Height of the new message
+    const newMessageStyles = getComputedStyle($newMessage)
+    const newMessageMargin = parseInt(newMessageStyles.marginBottom)
+    const newMessageHeight = $newMessage.offsetHeight + newMessageMargin
 
- //how far i scrolled
- const scrollOffset=$messages.scrollTop + visibleHeight
-if(containerHeight=newMessageHeight<=scrollHeight){
-$messages.scrollTop=$messages.scrollHeight
+    // Visible height
+    const visibleHeight = $messages.offsetHeight
+
+    // Height of messages container
+    const containerHeight = $messages.scrollHeight
+
+    // How far have I scrolled?
+    const scrollOffset = $messages.scrollTop + visibleHeight
+
+    if (containerHeight - newMessageHeight <= scrollOffset) {
+        $messages.scrollTop = $messages.scrollHeight
+    }
 }
-}
-
 
 socket.on('message', (message) => {
     console.log(message)
@@ -57,12 +60,12 @@ socket.on('locationMessage', (message) => {
     autoscroll()
 })
 
-socket.on('roomData',({room,users})=>{
-  const html=Mustache.render(sidebarTemplate,{
-      room,
-      users
-  })
-  document.querySelector('#sidebar').innerHTML=html
+socket.on('roomData', ({ room, users }) => {
+    const html = Mustache.render(sidebarTemplate, {
+        room,
+        users
+    })
+    document.querySelector('#sidebar').innerHTML = html
 })
 
 $messageForm.addEventListener('submit', (e) => {
